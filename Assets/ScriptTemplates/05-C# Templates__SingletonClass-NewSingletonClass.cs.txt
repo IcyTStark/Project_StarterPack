@@ -1,0 +1,7 @@
+public class #SCRIPTNAME# : Singleton<#SCRIPTNAME#>
+{
+    public override void Awake()
+    {
+        base.Awake();
+    }
+}
