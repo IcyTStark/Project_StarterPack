@@ -1,22 +1,36 @@
 using UnityEngine;
+using System;
 
 public class Singleton<T> : MonoBehaviour where T : Component
 {
-    private static T instance;
+    private static T _instance;
+    private static readonly object _lock = new object();
+    private static bool _applicationIsQuitting = false;
+
     public static T Instance
     {
         get
         {
-            if (instance == null)
+            if (_applicationIsQuitting)
             {
-                instance = (T)FindFirstObjectByType(typeof(T));
-
-                if (instance == null)
-                {
-                    SetupInstance();
-                }
+                Debug.LogWarning($"[Singleton] Instance '{typeof(T)}' already destroyed on application quit. Returning null.");
+                return null;
             }
-            return instance;
+
+            lock (_lock)
+            {
+                if (_instance == null)
+                {
+                    _instance = FindFirstObjectByType<T>();
+
+                    if (_instance == null)
+                    {
+                        SetupInstance();
+                    }
+                }
+
+                return _instance;
+            }
         }
     }
 
@@ -27,29 +41,52 @@ public class Singleton<T> : MonoBehaviour where T : Component
 
     private void RemoveDuplicates()
     {
-        if (instance == null)
+        if (_instance == null)
         {
-            instance = this as T;
+            _instance = this as T;
             DontDestroyOnLoad(gameObject);
+            Debug.Log($"[Singleton] {typeof(T)} instance set to DontDestroyOnLoad.");
         }
-        else
+        else if (_instance != this)
         {
+            Debug.LogWarning($"[Singleton] Another instance of {typeof(T)} already exists! Destroying duplicate.");
             Destroy(gameObject);
         }
     }
 
     private static void SetupInstance()
     {
-        instance = (T)FindFirstObjectByType(typeof(T));
+        GameObject singletonObject = new GameObject($"[Singleton] {typeof(T).Name}");
+        _instance = singletonObject.AddComponent<T>();
+        DontDestroyOnLoad(singletonObject);
+        Debug.Log($"[Singleton] An instance of {typeof(T)} was created automatically.");
+    }
 
-        if (instance == null)
+    protected virtual void OnDestroy()
+    {
+        if (_instance == this)
         {
-            GameObject gameObject = new();
-
-            gameObject.name = typeof(T).Name;
-            instance = gameObject.AddComponent<T>();
-
-            DontDestroyOnLoad(gameObject);
+            _instance = null;
         }
+    }
+
+    protected virtual void OnApplicationQuit()
+    {
+        _applicationIsQuitting = true;
+    }
+
+    // Optional: Initialize with custom parameters
+    public static T Initialize(Action<T> initAction = null)
+    {
+        T instance = Instance;
+        initAction?.Invoke(instance);
+        return instance;
+    }
+
+    // Optional: Reset the singleton state (useful for testing)
+    public static void Reset()
+    {
+        _instance = null;
+        _applicationIsQuitting = false;
     }
 }
