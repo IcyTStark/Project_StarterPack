@@ -1,0 +1,24 @@
+﻿using System;
+using UnityEngine;
+
+using Sirenix.OdinInspector;
+
+namespace TMS.Feedback.Audio
+{
+    [CreateAssetMenu(fileName = "AudioSettings", menuName = "ScriptableObjects/Generic/Audio/AudioSettings")]
+    public class AudioSettingsConfigSO : ScriptableObject
+    {
+        [Header("Volume Settings: ")]
+        [PropertyRange(0f, 1f)] private float _masterVolume = 1f;
+        [PropertyRange(0f, 1f)] private float _musicVolume = 1f;
+        [PropertyRange(0f, 1f)] private float _sfxVolume = 1f;
+        [PropertyRange(0f, 1f)] private float _uiSoundVolume = 1f;
+        private float _crossfadeDuration = 1f;
+
+        public float MasterVolume => _masterVolume;
+        public float MusicVolume => _musicVolume;
+        public float SfxVolume => _sfxVolume;
+        public float UISoundVolume => _uiSoundVolume;
+        public float CrossfadeDuration => _crossfadeDuration;
+    }
+}

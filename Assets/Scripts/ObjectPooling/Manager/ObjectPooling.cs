@@ -2,19 +2,19 @@ using System;
 using UnityEngine.Pool;
 using UnityEngine;
 
-namespace Utils.ObjectPoolSystem
+namespace TMS.ObjectPoolSystem
 {
     public abstract class ObjectPoolBase<T> : IObjectPooling<T> where T : MonoBehaviour
     {
-        protected IObjectPool<T> objectPool;
-        protected T prefab;
+        protected IObjectPool<T> _objectPool;
+        protected T _prefab;
 
-        protected IObjectPool<T> ObjectPool => objectPool;
+        protected IObjectPool<T> ObjectPool => _objectPool;
 
         public ObjectPoolBase(T prefab, bool collectionCheck = true, int defaultCapacity = 20, int maxPoolCapacity = 100)
         {
-            this.prefab = prefab;
-            objectPool = new ObjectPool<T>(CreateObject, GetObjectFromPool, ReturnObject, DestroyPooledObject, collectionCheck, defaultCapacity, maxPoolCapacity);
+            this._prefab = prefab;
+            _objectPool = new ObjectPool<T>(CreateObject, GetObjectFromPool, ReturnObject, DestroyPooledObject, collectionCheck, defaultCapacity, maxPoolCapacity);
         }
 
         public abstract T CreateObject();
@@ -36,12 +36,12 @@ namespace Utils.ObjectPoolSystem
 
         public T Get()
         {
-            return objectPool.Get(); 
+            return _objectPool.Get(); 
         }
 
         public void Release(T obj)
         {
-            objectPool.Release(obj); 
+            _objectPool.Release(obj); 
         }
     }
 }

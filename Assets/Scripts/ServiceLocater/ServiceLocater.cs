@@ -5,21 +5,21 @@ public static class ServiceLocator
 {
     private static Dictionary<Type, object> services = new Dictionary<Type, object>();
 
-    public static void RegisterService<T>(T service) where T : class
+    public static void RegisterService<T>(T service) 
     {
         services[typeof(T)] = service;
     }
 
-    public static T GetService<T>() where T : class
+    public static T GetService<T>()
     {
         if (services.TryGetValue(typeof(T), out var service))
         {
             return (T)service;
         }
-        return null;
+        return default;
     }
 
-    public static bool HasService<T>() where T : class
+    public static bool HasService<T>()
     {
         return services.ContainsKey(typeof(T));
     }

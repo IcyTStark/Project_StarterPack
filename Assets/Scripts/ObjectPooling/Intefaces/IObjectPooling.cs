@@ -1,4 +1,4 @@
-namespace Utils.ObjectPoolSystem
+namespace TMS.ObjectPoolSystem
 {
     public interface IObjectPooling<T>
     {

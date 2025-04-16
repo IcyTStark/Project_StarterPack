@@ -1,6 +1,7 @@
 using System;
+using EnhancedSignals;
 
-public class OnDataLoadedSignal
+public class OnDataLoadedSignal : ASignal
 {
 
 }

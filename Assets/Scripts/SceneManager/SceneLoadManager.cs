@@ -16,12 +16,12 @@ public class SceneLoadManager : Singleton<SceneLoadManager>
 
     private void OnEnable()
     {
-        CustomDebug.Log("SceneLoadManager", "OnEnable called.");
+
     }
 
     private void OnDisable()
     {
-        CustomDebug.Log("SceneLoadManager", "OnDisable called.");
+
     }
 
     private void OnDataLoaded(OnDataLoadedSignal signal)
