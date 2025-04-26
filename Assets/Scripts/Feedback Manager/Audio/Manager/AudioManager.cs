@@ -2,13 +2,12 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using TMS.ObjectPoolSystem;
-using TMS.Feedback.Haptics;
+using TMS.ExtendedCoroutine;
 
 namespace TMS.Feedback.Audio
 {
     /// <summary>
-    /// Implementation of the IAudio interface that handles all game audio functionality
+    /// Audio manager implementation that uses AudioSourceSFXPool
     /// </summary>
     public class AudioManager : IAudio, IDisposable
     {
@@ -20,7 +19,7 @@ namespace TMS.Feedback.Audio
         // Audio sources
         private AudioSource _musicSource;
         private AudioSource _uiSource;
-        private List<AudioSource> _activeSfxSources = new List<AudioSource>();
+        private List<AudioSourceItem> _activeSfxSources = new List<AudioSourceItem>();
 
         // Object pooling for SFX audio sources
         private GameObject _audioSourcesContainer;
@@ -29,6 +28,10 @@ namespace TMS.Feedback.Audio
         // State tracking
         private bool _isMusicOn = true;
         private bool _isSfxOn = true;
+
+        // Current music tracking
+        private AudioClip _currentMusicClip;
+        private Coroutine _fadeCoroutine;
 
         public AudioManager(AudioSettingsConfigSO audioSettings)
         {
@@ -42,7 +45,7 @@ namespace TMS.Feedback.Audio
             GameObject musicObj = new GameObject("Music Source");
             musicObj.transform.SetParent(_audioSourcesContainer.transform);
             _musicSource = musicObj.AddComponent<AudioSource>();
-            _musicSource.playOnAwake = false;
+            _musicSource.playOnAwake = true;
             _musicSource.loop = true;
             _musicSource.volume = _audioSettings.MasterVolume * _audioSettings.MusicVolume;
 
@@ -54,7 +57,7 @@ namespace TMS.Feedback.Audio
             _uiSource.loop = false;
             _uiSource.volume = _audioSettings.MasterVolume * _audioSettings.UISoundVolume;
 
-            // Initialize SFX pool
+            // Initialize SFX pool using your existing infrastructure
             InitializeSfxPool();
 
             SmartDebug.DevOnly("AudioManager initialized successfully", "AUDIO");
@@ -62,14 +65,35 @@ namespace TMS.Feedback.Audio
 
         private void InitializeSfxPool()
         {
-            // Create a prefab for pooled audio sources
-            GameObject sfxParentObject = new GameObject("SFX Source Parent");
+            // Create or load AudioSourceItem prefab
+            AudioSourceItem prefab = Resources.Load<AudioSourceItem>("AudioSourcePrefab");
 
-            AudioSourceItem audioSourcePrefab = Resources.Load<AudioSourceItem>("AudioSourcePrefab");
-            _sfxPool = new AudioSourceSFXPool(audioSourcePrefab, _audioSettings, sfxParentObject.transform);
-            // Create the pool with our prefab
+            // Create a prefab if none exists
+            if (prefab == null)
+            {
+                GameObject sfxPrefab = new GameObject("SFX Source");
+                prefab = sfxPrefab.AddComponent<AudioSourceItem>();
+                sfxPrefab.AddComponent<AudioSource>();
 
-            SmartDebug.DevOnly("SFX Pool initialized", "AUDIO");
+                // Keep the prefab object inactive and hidden
+                sfxPrefab.SetActive(false);
+                sfxPrefab.hideFlags = HideFlags.HideAndDontSave;
+            }
+
+            GameObject sfxPrefabParent = new GameObject("SFX Parent");
+            sfxPrefabParent.transform.SetParent(_audioSourcesContainer.transform);
+
+            // Create SFX audio source pool using your existing ObjectPoolBase
+            _sfxPool = new AudioSourceSFXPool(
+                prefab,
+                _audioSettings,
+                sfxPrefabParent.transform,
+                true,  // collectionCheck
+                10,    // defaultCapacity 
+                30     // maxPoolCapacity
+            );
+
+            SmartDebug.DevOnly("SFX Pool initialized with AudioSourceSFXPool", "AUDIO");
         }
 
         public void SetVolume(float volume)
@@ -80,9 +104,9 @@ namespace TMS.Feedback.Audio
             // Update all active SFX sources
             foreach (var sfxSource in _activeSfxSources)
             {
-                if (sfxSource != null)
+                if (sfxSource != null && sfxSource.AudioSource != null)
                 {
-                    sfxSource.volume = volume * _audioSettings.SfxVolume;
+                    sfxSource.AudioSource.volume = volume * _audioSettings.SfxVolume;
                 }
             }
 
@@ -112,13 +136,16 @@ namespace TMS.Feedback.Audio
             // If turning off, stop all active SFX
             if (!_isSfxOn)
             {
-                foreach (var sfxSource in _activeSfxSources)
+                foreach (var sfxSource in _activeSfxSources.ToArray())
                 {
-                    if (sfxSource != null && sfxSource.isPlaying)
+                    if (sfxSource != null && sfxSource.AudioSource != null && sfxSource.AudioSource.isPlaying)
                     {
-                        sfxSource.Stop();
+                        sfxSource.AudioSource.Stop();
+                        _sfxPool.Release(sfxSource);
                     }
                 }
+
+                _activeSfxSources.Clear();
             }
 
             SmartDebug.DevOnly($"SFX toggled: {sfxState}", "AUDIO");
@@ -128,8 +155,26 @@ namespace TMS.Feedback.Audio
         {
             if (clip == null) return;
 
-            _musicSource.clip = clip;
-            _musicSource.Play();
+            _currentMusicClip = clip;
+
+            // If we're already playing something, crossfade
+            if (_musicSource.isPlaying && _musicSource.clip != null && _musicSource.clip != clip)
+            {
+                if (_fadeCoroutine != null)
+                {
+                    CoroutineRunner.Instance.StopCoroutine(_fadeCoroutine);
+                }
+
+                _fadeCoroutine = CoroutineRunner.Instance.StartCoroutine(
+                    CrossfadeMusic(clip, _audioSettings.CrossfadeDuration));
+            }
+            else
+            {
+                // Just play normally
+                _musicSource.clip = clip;
+                _musicSource.Play();
+            }
+
             _isPlaying = true;
 
             SmartDebug.DevOnly($"Playing music clip: {clip.name}", "AUDIO");
@@ -139,37 +184,48 @@ namespace TMS.Feedback.Audio
         {
             if (clip == null || !_isSfxOn) return;
 
-            // Get a pooled audio source
-            //AudioSourceComponent sourceComponent = _sfxPool.Get();
-            //AudioSource source = sourceComponent.AudioSource;
+            // Get an audio source from the pool
+            AudioSourceItem source = _sfxPool.Get();
 
-            //// Configure and play
-            //source.transform.position = position;
-            //source.clip = clip;
-            //source.volume = _audioSettings.MasterVolume * _audioSettings.SfxVolume * volumeScale;
-            //source.Play();
+            // Validate the source
+            if (source == null || source.AudioSource == null)
+            {
+                SmartDebug.DevOnly("Failed to get audio source from pool", "AUDIO");
+                return;
+            }
 
-            //// Add to active sources
-            //_activeSfxSources.Add(source);
+            // Configure the source
+            source.transform.position = position;
+            source.AudioSource.clip = clip;
+            source.AudioSource.volume = _audioSettings.MasterVolume * _audioSettings.SfxVolume * volumeScale;
+            source.AudioSource.spatialBlend = 1.0f; // Make it fully 3D
+            source.AudioSource.Play();
 
-            // Start coroutine to return to pool
-            //sourceComponent.StartCoroutine(ReturnToPoolWhenFinished(sourceComponent, source, clip.length));
+            // Add to active sources for tracking
+            _activeSfxSources.Add(source);
 
-            SmartDebug.DevOnly($"Playing SFX at point: {clip.name}", "AUDIO");
+            // Start coroutine to return to pool when done
+            CoroutineRunner.Instance.StartCoroutine(ReturnToPoolWhenFinished(source, clip.length));
+
+            SmartDebug.DevOnly($"Playing SFX at point: {clip.name} at {position}", "AUDIO");
         }
 
-        private IEnumerator ReturnToPoolWhenFinished(AudioSourceComponent component, AudioSource source, float delay)
+        private IEnumerator ReturnToPoolWhenFinished(AudioSourceItem source, float delay)
         {
             yield return new WaitForSeconds(delay);
 
-            //_activeSfxSources.Remove(source);
-            //_sfxPool.Release(component);
+            if (source != null)
+            {
+                _activeSfxSources.Remove(source);
+                _sfxPool.Release(source);
+            }
         }
 
         public void PlayDelayed(AudioClip clip, float delayTime)
         {
             if (clip == null) return;
 
+            _currentMusicClip = clip;
             _musicSource.clip = clip;
             _musicSource.PlayDelayed(delayTime);
             _isPlaying = true;
@@ -183,7 +239,7 @@ namespace TMS.Feedback.Audio
 
             _uiSource.PlayOneShot(clip, volumeScale);
 
-            SmartDebug.DevOnly($"Playing UI OneShot: {clip.name}", "AUDIO");
+            SmartDebug.DevOnly($"Playing OneShot: {clip.name}", "AUDIO");
         }
 
         public void PlayScheduled(float scheduledTime)
@@ -223,25 +279,69 @@ namespace TMS.Feedback.Audio
             SmartDebug.DevOnly("Music stopped", "AUDIO");
         }
 
+        private IEnumerator CrossfadeMusic(AudioClip newClip, float fadeDuration)
+        {
+            // Create a temporary audio source for the new clip
+            GameObject tempObj = new GameObject("Temp Music Source");
+            tempObj.transform.SetParent(_audioSourcesContainer.transform);
+            AudioSource tempSource = tempObj.AddComponent<AudioSource>();
+
+            // Set up the new source with the same settings as our music source
+            tempSource.clip = newClip;
+            tempSource.loop = true;
+            tempSource.volume = 0;
+            tempSource.Play();
+
+            float startVolume = _musicSource.volume;
+            float timer = 0;
+
+            // Fade out the old music and fade in the new
+            while (timer < fadeDuration)
+            {
+                timer += Time.deltaTime;
+                float t = timer / fadeDuration;
+
+                _musicSource.volume = Mathf.Lerp(startVolume, 0, t);
+                tempSource.volume = Mathf.Lerp(0, startVolume, t);
+
+                yield return null;
+            }
+
+            // Swap the clips and clean up
+            _musicSource.Stop();
+            _musicSource.clip = newClip;
+            _musicSource.volume = startVolume;
+            _musicSource.Play();
+
+            GameObject.Destroy(tempObj);
+            _fadeCoroutine = null;
+        }
+
         public void Dispose()
         {
-            // Clean up resources
+            // Stop all current audio
+            if (_musicSource != null) _musicSource.Stop();
+            if (_uiSource != null) _uiSource.Stop();
+
+            // Return all active SFX sources to the pool
+            foreach (var source in _activeSfxSources.ToArray())
+            {
+                if (source != null && source.AudioSource != null)
+                {
+                    source.AudioSource.Stop();
+                    _sfxPool.Release(source);
+                }
+            }
+
+            _activeSfxSources.Clear();
+
+            // Destroy container
             if (_audioSourcesContainer != null)
             {
                 GameObject.Destroy(_audioSourcesContainer);
             }
 
-            _activeSfxSources.Clear();
-
             SmartDebug.DevOnly("AudioManager disposed", "AUDIO");
         }
-    }
-
-    /// <summary>
-    /// Helper component to attach to pooled audio sources
-    /// </summary>
-    public class AudioSourceComponent : MonoBehaviour
-    {
-        public AudioSource AudioSource { get; set; }
     }
 }
