@@ -2,9 +2,9 @@ using System;
 using TMS.ObjectPoolSystem;
 using UnityEngine;
 
-public class AudioSourcePool<T> : ObjectPoolBase<T> where T : MonoBehaviour
+public class AudioSourceSFXPool<T> : ObjectPoolBase<T> where T : MonoBehaviour
 {
-    public AudioSourcePool(T prefab, bool collectionCheck = true, int defaultCapacity = 20, int maxPoolCapacity = 100) : base(prefab, collectionCheck, defaultCapacity, maxPoolCapacity)
+    public AudioSourceSFXPool(T prefab, bool collectionCheck = true, int defaultCapacity = 20, int maxPoolCapacity = 100) : base(prefab, collectionCheck, defaultCapacity, maxPoolCapacity)
     {
 
     }
