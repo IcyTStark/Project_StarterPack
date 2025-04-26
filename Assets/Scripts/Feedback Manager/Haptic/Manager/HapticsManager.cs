@@ -30,6 +30,8 @@ namespace TMS.Feedback.Haptics
         {
             SmartDebug.DevOnly("HapticsManager initialized with settings", "HAPTICS");
 
+            SmartDebug.DevOnly($" Settings: {settings}");
+
             SetHapticsStrength(settings.HapticStrength);
 
             HapticController.PlaybackStopped += OnHapticsStopped;

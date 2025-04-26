@@ -9,7 +9,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: d6ea0f49bb285504287a04901656339a, type: 3}
+  m_Script: {fileID: 11500000, guid: 971ee91ee1b8a6147a9aae3618b0b349, type: 3}
   m_Name: HapticSettings
   m_EditorClassIdentifier: 
-  hapticStrength: 1
+  _hapticStrength: 1

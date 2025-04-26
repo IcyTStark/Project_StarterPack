@@ -1,36 +1,42 @@
 using System;
+using TMS.Feedback.Audio;
 using TMS.ObjectPoolSystem;
 using UnityEngine;
 
-public class AudioSourceSFXPool<T> : ObjectPoolBase<T> where T : MonoBehaviour
+public class AudioSourceSFXPool : ObjectPoolBase<AudioSourceItem>
 {
-    public AudioSourceSFXPool(T prefab, bool collectionCheck = true, int defaultCapacity = 20, int maxPoolCapacity = 100) : base(prefab, collectionCheck, defaultCapacity, maxPoolCapacity)
+    private AudioSettingsConfigSO _audioSettings;   
+    private Transform _parentObject;
+
+    public AudioSourceSFXPool(AudioSourceItem prefab, bool collectionCheck = true, int defaultCapacity = 20, int maxPoolCapacity = 100) 
+        : base(prefab, collectionCheck, defaultCapacity, maxPoolCapacity)
     {
 
     }
 
-    public override T CreateObject()
+    public AudioSourceSFXPool(AudioSourceItem prefab, AudioSettingsConfigSO audioSettings, Transform parentObject, bool collectionCheck = true, int defaultCapacity = 20, int maxPoolCapacity = 100)
+        : base(prefab, collectionCheck, defaultCapacity, maxPoolCapacity)
     {
-        return UnityEngine.Object.Instantiate(_prefab);
+        _audioSettings = audioSettings;
+        _parentObject = parentObject;
     }
 
-    public override void GetObjectFromPool(T pooledObject)
+    public override AudioSourceItem CreateObject()
+    {
+        AudioSourceItem audioSourceInstance = GameObject.Instantiate(_prefab);
+        audioSourceInstance.Initialize(_audioSettings);
+        audioSourceInstance.AudioSourcePool = this;
+        audioSourceInstance.transform.SetParent(_parentObject);
+        return audioSourceInstance;
+    }
+
+    public override void GetObjectFromPool(AudioSourceItem pooledObject)
     {
         base.GetObjectFromPool(pooledObject);
-        AudioSource audioSource = pooledObject.GetComponent<AudioSource>();
-        if (audioSource != null)
-        {
-            audioSource.Play();
-        }
     }
 
-    public override void ReturnObject(T pooledObject)
+    public override void ReturnObject(AudioSourceItem pooledObject)
     {
         base.ReturnObject(pooledObject);
-        AudioSource audioSource = pooledObject.GetComponent<AudioSource>();
-        if (audioSource != null)
-        {
-            audioSource.Stop();
-        }
     }
 }

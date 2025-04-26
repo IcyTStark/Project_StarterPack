@@ -8,7 +8,7 @@ namespace TMS.Feedback.Haptics
     public class HapticSettingsConfigSO : ScriptableObject
     {
         [Header("Haptic Strength: ")]
-        [MaxValue(1)] private float _hapticStrength = 1.0f;
+        [MaxValue(1)] [SerializeField] private float _hapticStrength = 1.0f;
         public float HapticStrength => _hapticStrength;
     }
 }
