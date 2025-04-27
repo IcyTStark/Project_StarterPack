@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using TMS.ExtendedCoroutine;
+using UnityEngine.UIElements;
 
 namespace TMS.Feedback.Audio
 {
@@ -37,10 +38,26 @@ namespace TMS.Feedback.Audio
         {
             _audioSettings = audioSettings;
 
+            CreateAudioHolders();
+
+            CreateMusicSource();
+
+            CreateUISource();
+
+            CreateSFXSource();
+
+            SmartDebug.DevOnly("AudioManager initialized successfully", "AUDIO");
+        }
+
+        private void CreateAudioHolders()
+        {
             // Create container for audio sources
             _audioSourcesContainer = new GameObject("Audio Sources Container");
             GameObject.DontDestroyOnLoad(_audioSourcesContainer);
+        }
 
+        private void CreateMusicSource()
+        {
             // Initialize music source
             GameObject musicObj = new GameObject("Music Source");
             musicObj.transform.SetParent(_audioSourcesContainer.transform);
@@ -48,7 +65,10 @@ namespace TMS.Feedback.Audio
             _musicSource.playOnAwake = true;
             _musicSource.loop = true;
             _musicSource.volume = _audioSettings.MasterVolume * _audioSettings.MusicVolume;
+        }
 
+        private void CreateUISource()
+        {
             // Initialize UI source
             GameObject uiObj = new GameObject("UI Source");
             uiObj.transform.SetParent(_audioSourcesContainer.transform);
@@ -56,11 +76,12 @@ namespace TMS.Feedback.Audio
             _uiSource.playOnAwake = false;
             _uiSource.loop = false;
             _uiSource.volume = _audioSettings.MasterVolume * _audioSettings.UISoundVolume;
+        }
 
+        private void CreateSFXSource()
+        {
             // Initialize SFX pool using your existing infrastructure
             InitializeSfxPool();
-
-            SmartDebug.DevOnly("AudioManager initialized successfully", "AUDIO");
         }
 
         private void InitializeSfxPool()
@@ -237,7 +258,26 @@ namespace TMS.Feedback.Audio
         {
             if (clip == null || !_isSfxOn) return;
 
-            _uiSource.PlayOneShot(clip, volumeScale);
+            // Get an audio source from the pool
+            AudioSourceItem source = _sfxPool.Get();
+
+            // Validate the source
+            if (source == null || source.AudioSource == null)
+            {
+                SmartDebug.DevOnly("Failed to get audio source from pool", "AUDIO");
+                return;
+            }
+
+            // Configure the source
+            source.AudioSource.clip = clip;
+            source.AudioSource.volume = _audioSettings.MasterVolume * _audioSettings.SfxVolume * volumeScale;
+            source.AudioSource.Play();
+
+            // Add to active sources for tracking
+            _activeSfxSources.Add(source);
+
+            // Start coroutine to return to pool when done
+            CoroutineRunner.Instance.StartCoroutine(ReturnToPoolWhenFinished(source, clip.length));
 
             SmartDebug.DevOnly($"Playing OneShot: {clip.name}", "AUDIO");
         }
