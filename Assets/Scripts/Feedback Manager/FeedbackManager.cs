@@ -33,9 +33,6 @@ namespace TMS.Feedback
 
         public FeedbackManager()
         {
-            // Initialize with default values until data is loaded
-            _feedbackSaveData = new FeedbackSaveData();
-
             LoadAudio();
             LoadHaptics();
 
@@ -54,6 +51,28 @@ namespace TMS.Feedback
             _hapticsManager ??= new HapticsManager(_hapticSettings);
         }
 
+        #region Load and Save
+        private void OnDataLoaded()
+        {
+            _feedbackSaveData = SaveManager.Instance.SaveData.feedbackSaveData ?? new FeedbackSaveData();
+
+            // Apply loaded settings to managers
+            _audioManager.ToggleMusic(_feedbackSaveData.isMusicOn);
+            _audioManager.ToggleSFX(_feedbackSaveData.isSFXOn);
+            _hapticsManager.ToggleHaptics(_feedbackSaveData.isHapticOn);
+
+            SmartDebug.DevOnly($"Feedback settings loaded - Music: {_feedbackSaveData.isMusicOn}, SFX: {_feedbackSaveData.isSFXOn}, Haptic: {_feedbackSaveData.isHapticOn}", "FEEDBACK");
+        }
+
+        public async void Save()
+        {
+            SaveManager.Instance.SaveData.feedbackSaveData = _feedbackSaveData;
+            await SaveManager.Instance.SaveAsync();
+
+            SmartDebug.DevOnly("Feedback settings saved", "FEEDBACK");
+        }
+        #endregion
+
         public void Dispose()
         {
             Signals.Get<OnDataLoadedSignal>().RemoveListener(OnDataLoaded);
@@ -67,16 +86,6 @@ namespace TMS.Feedback
             {
                 hapticsDisposable.Dispose();
             }
-        }
-
-        private void ToggleSetting(ref bool setting, bool isHaptics = false)
-        {
-            setting = !setting;
-
-            if (isHaptics)
-                _hapticsManager.ToggleHaptics(_feedbackSaveData.isHapticOn);
-
-            Save();
         }
 
         #region Audio Controls
@@ -168,7 +177,12 @@ namespace TMS.Feedback
 
         #region Haptic Calls
 
-        public void ToggleHaptics() => ToggleSetting(ref _feedbackSaveData.isHapticOn, true);
+        public void ToggleHaptics()
+        {
+            _feedbackSaveData.isHapticOn = !_feedbackSaveData.isHapticOn;
+            _hapticsManager.ToggleHaptics(_feedbackSaveData.isHapticOn);
+            Save();
+        }
 
         public void SetHapticStrength(float strength) => _hapticsManager.SetHapticsStrength(strength);
 
@@ -202,28 +216,6 @@ namespace TMS.Feedback
             {
                 _hapticsManager.PlayHapticClip(hapticClip, fallbackPreset);
             }
-        }
-        #endregion
-
-        #region Load and Save
-        private void OnDataLoaded()
-        {
-            _feedbackSaveData = SaveManager.Instance.SaveData.feedbackSaveData ?? new FeedbackSaveData();
-
-            // Apply loaded settings to managers
-            _audioManager.ToggleMusic(_feedbackSaveData.isMusicOn);
-            _audioManager.ToggleSFX(_feedbackSaveData.isSFXOn);
-            _hapticsManager.ToggleHaptics(_feedbackSaveData.isHapticOn);
-
-            SmartDebug.DevOnly($"Feedback settings loaded - Music: {_feedbackSaveData.isMusicOn}, SFX: {_feedbackSaveData.isSFXOn}, Haptic: {_feedbackSaveData.isHapticOn}", "FEEDBACK");
-        }
-
-        public async void Save()
-        {
-            SaveManager.Instance.SaveData.feedbackSaveData = _feedbackSaveData;
-            await SaveManager.Instance.SaveAsync();
-
-            SmartDebug.DevOnly("Feedback settings saved", "FEEDBACK");
         }
         #endregion
     }
