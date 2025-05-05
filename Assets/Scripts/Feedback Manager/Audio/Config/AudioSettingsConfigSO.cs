@@ -9,11 +9,11 @@ namespace TMS.Feedback.Audio
     public class AudioSettingsConfigSO : ScriptableObject
     {
         [Header("Volume Settings: ")]
-        [PropertyRange(0f, 1f)] private float _masterVolume = 1f;
-        [PropertyRange(0f, 1f)] private float _musicVolume = 1f;
-        [PropertyRange(0f, 1f)] private float _sfxVolume = 1f;
-        [PropertyRange(0f, 1f)] private float _uiSoundVolume = 1f;
-        private float _crossfadeDuration = 1f;
+        [PropertyRange(0f, 1f)] [MaxValue(1)] [SerializeField] private float _masterVolume = 1f;
+        [PropertyRange(0f, 1f)] [MaxValue(1)] [SerializeField] private float _musicVolume = 1f;
+        [PropertyRange(0f, 1f)] [MaxValue(1)] [SerializeField] private float _sfxVolume = 1f;
+        [PropertyRange(0f, 1f)] [MaxValue(1)] [SerializeField] private float _uiSoundVolume = 1f;
+        [PropertyRange(0f, 1f)] [MaxValue(1)] [SerializeField] private float _crossfadeDuration = 1f;
 
         public float MasterVolume => _masterVolume;
         public float MusicVolume => _musicVolume;
