@@ -2,6 +2,7 @@
 using UnityEngine;
 
 using Sirenix.OdinInspector;
+using UnityEngine.Audio;
 
 namespace TMS.Feedback.Audio
 {
@@ -14,6 +15,8 @@ namespace TMS.Feedback.Audio
         [PropertyRange(0f, 1f)] [MaxValue(1)] [SerializeField] private float _sfxVolume = 1f;
         [PropertyRange(0f, 1f)] [MaxValue(1)] [SerializeField] private float _uiSoundVolume = 1f;
         [PropertyRange(0f, 1f)] [MaxValue(1)] [SerializeField] private float _crossfadeDuration = 1f;
+
+        [SerializeField] private AudioMixerGroup _musicMixerGroup;
 
         public float MasterVolume => _masterVolume;
         public float MusicVolume => _musicVolume;

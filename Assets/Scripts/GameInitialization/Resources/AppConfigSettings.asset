@@ -12,3 +12,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0b558bbac63177841b6f03cf3d5a0dc4, type: 3}
   m_Name: AppConfigSettings
   m_EditorClassIdentifier: 
+  targetFrameRate: 60
+  shouldRunInBackground: 0
+  sleepTimeout: -1
