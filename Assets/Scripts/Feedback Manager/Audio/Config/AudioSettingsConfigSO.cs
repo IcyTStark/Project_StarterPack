@@ -14,7 +14,7 @@ namespace TMS.Feedback.Audio
         [PropertyRange(0f, 1f)] [MaxValue(1)] [SerializeField] private float _musicVolume = 1f;
         [PropertyRange(0f, 1f)] [MaxValue(1)] [SerializeField] private float _sfxVolume = 1f;
         [PropertyRange(0f, 1f)] [MaxValue(1)] [SerializeField] private float _uiSoundVolume = 1f;
-        [PropertyRange(0f, 1f)] [MaxValue(1)] [SerializeField] private float _crossfadeDuration = 1f;
+        [PropertyRange(0f, 10f)] [MaxValue(100)] [SerializeField] private float _crossfadeDuration = 1f;
 
         [Title("Mixer Groups: ")]
         [SerializeField] private AudioMixer _mixer;

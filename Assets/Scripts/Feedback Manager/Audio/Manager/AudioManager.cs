@@ -356,6 +356,7 @@ namespace TMS.Feedback.Audio
             _musicSource.Stop();
             _musicSource.clip = newClip;
             _musicSource.volume = startVolume;
+            _musicSource.time = tempSource.time;
             _musicSource.Play();
 
             GameObject.Destroy(tempObj);
