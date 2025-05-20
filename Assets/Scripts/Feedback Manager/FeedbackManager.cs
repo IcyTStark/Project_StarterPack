@@ -15,10 +15,8 @@ namespace TMS.Feedback
     /// </summary>
     public class FeedbackManager : IFeedbackManager, IDisposable
     {
-        //Save Data
         private FeedbackSaveData _feedbackSaveData;
 
-        // Properties for state access
         public bool IsMusicOn => _feedbackSaveData?.isMusicOn ?? true;
         public bool IsSFXOn => _feedbackSaveData?.isSFXOn ?? true;
         public bool IsHapticOn => _feedbackSaveData?.isHapticOn ?? true;
@@ -26,6 +24,7 @@ namespace TMS.Feedback
         //Audio
         private AudioSettingsConfigSO _audioSettings;
         private IAudio _audioManager;
+        private AudioLibrary _audioLibrary; // Added AudioLibrary reference
 
         //Haptics
         private HapticSettingsConfigSO _hapticSettings;
@@ -42,6 +41,13 @@ namespace TMS.Feedback
         private void LoadAudio()
         {
             _audioSettings = Resources.Load<AudioSettingsConfigSO>("AudioSettings");
+            _audioLibrary = Resources.Load<AudioLibrary>("AudioLibrary"); // Load the AudioLibrary
+
+            if (_audioLibrary == null)
+            {
+                SmartDebug.Warning("AudioLibrary could not be loaded from Resources", "FEEDBACK");
+            }
+
             _audioManager ??= new AudioManager(_audioSettings);
         }
 
@@ -104,9 +110,39 @@ namespace TMS.Feedback
             Save();
         }
 
+        // Get a clip from the AudioLibrary
+        private AudioClip GetClipFromType(AudioType audioType)
+        {
+            if (_audioLibrary == null)
+            {
+                SmartDebug.Warning("AudioLibrary not loaded", "AUDIO");
+                return null;
+            }
+
+            AudioClip clip = _audioLibrary.GetAudioClip(audioType);
+            if (clip == null)
+            {
+                SmartDebug.Warning($"No audio clip found for type {audioType}", "AUDIO");
+            }
+
+            return clip;
+        }
+
+        #region Overloaded Audio Methods
+
+        // Music methods
         public void PlayMusic(AudioClip clip)
         {
-            if (_feedbackSaveData.isMusicOn)
+            if (_feedbackSaveData.isMusicOn && clip != null)
+            {
+                _audioManager.Play(clip);
+            }
+        }
+
+        public void PlayMusic(AudioType audioType)
+        {
+            AudioClip clip = GetClipFromType(audioType);
+            if (_feedbackSaveData.isMusicOn && clip != null)
             {
                 _audioManager.Play(clip);
             }
@@ -130,29 +166,61 @@ namespace TMS.Feedback
             _audioManager.Stop();
         }
 
+        // SFX methods
         public void PlaySFX(AudioClip clip, float volumeScale = 1f)
         {
-            if (_feedbackSaveData.isSFXOn)
+            if (_feedbackSaveData.isSFXOn && clip != null)
             {
                 _audioManager.PlayOneShot(clip, volumeScale);
             }
         }
 
+        public void PlaySFX(AudioType audioType, float volumeScale = 1f)
+        {
+            AudioClip clip = GetClipFromType(audioType);
+            if (_feedbackSaveData.isSFXOn && clip != null)
+            {
+                PlaySFX(clip, volumeScale);
+            }
+        }
+
+        // SFX at position methods
         public void PlaySFXAtPosition(AudioClip clip, Vector3 position, float volumeScale = 1f)
         {
-            if (_feedbackSaveData.isSFXOn)
+            if (_feedbackSaveData.isSFXOn && clip != null)
             {
                 _audioManager.PlayClipAtPoint(clip, position, volumeScale);
             }
         }
 
+        public void PlaySFXAtPosition(AudioType audioType, Vector3 position, float volumeScale = 1f)
+        {
+            AudioClip clip = GetClipFromType(audioType);
+            if (_feedbackSaveData.isSFXOn && clip != null)
+            {
+                PlaySFXAtPosition(clip, position, volumeScale);
+            }
+        }
+
+        // UI sound methods
         public void PlayUISound(AudioClip clip, float volumeScale = 1f)
         {
-            if (_feedbackSaveData.isSFXOn)
+            if (_feedbackSaveData.isSFXOn && clip != null)
             {
                 _audioManager.PlayOneShot(clip, volumeScale);
             }
         }
+
+        public void PlayUISound(AudioType audioType, float volumeScale = 1f)
+        {
+            AudioClip clip = GetClipFromType(audioType);
+            if (_feedbackSaveData.isSFXOn && clip != null)
+            {
+                PlayUISound(clip, volumeScale);
+            }
+        }
+
+        #endregion
 
         public void SetMasterVolume(float volume)
         {

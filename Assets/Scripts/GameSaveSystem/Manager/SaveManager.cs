@@ -1,3 +1,4 @@
+using EnhancedSignals;
 using System;
 using System.Threading.Tasks;
 
@@ -61,6 +62,7 @@ public class SaveManager : Singleton<SaveManager>
             onSuccess: (data) =>
             {
                 saveData = data;
+                Signals.Get<OnDataLoadedSignal>().Dispatch();
             },
             onFailure: (error) =>
             {

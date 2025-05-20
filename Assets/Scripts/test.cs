@@ -5,12 +5,22 @@ using System.Collections.Generic;
 using Sirenix.OdinInspector;
 using UnityEngine.UI;
 
+using TMS.Feedback;
+using EnhancedSignals;
+
 public class test : MonoBehaviour
 {
-    [SerializeField] private Button testButton;
+    private IFeedbackManager feedbackManager;
 
-    private void Awake()
+    [SerializeField] private AudioType audioType;
+
+    private void Start()
     {
-        testButton.onClick.AddListener(() => Debug.Log("Button Clicked"));
+        feedbackManager = ServiceLocator.GetService<IFeedbackManager>();
+
+        if (feedbackManager != null)
+        {
+            feedbackManager.PlayMusic(audioType);
+        }
     }
 }

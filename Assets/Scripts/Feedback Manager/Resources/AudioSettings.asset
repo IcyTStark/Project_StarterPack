@@ -13,8 +13,13 @@ MonoBehaviour:
   m_Name: AudioSettings
   m_EditorClassIdentifier: 
   _masterVolume: 1
-  _musicVolume: 1
+  _musicVolume: 0.3
   _sfxVolume: 1
   _uiSoundVolume: 1
   _crossfadeDuration: 1
-  _musicMixerGroup: {fileID: 24300002, guid: dc5099757ab269b4795951447ffda229, type: 2}
+  _mixer: {fileID: 24100000, guid: dc5099757ab269b4795951447ffda229, type: 2}
+  _masterMixerGroup: {fileID: 24300002, guid: dc5099757ab269b4795951447ffda229, type: 2}
+  _musicMixerGroup: {fileID: -2273146209696275378, guid: dc5099757ab269b4795951447ffda229, type: 2}
+  _sfxMixerGroup: {fileID: -3165942800488051908, guid: dc5099757ab269b4795951447ffda229, type: 2}
+  _uiSoundMixerGroup: {fileID: -3783893103257190392, guid: dc5099757ab269b4795951447ffda229, type: 2}
+  _defaultSnapshot: {fileID: 24500006, guid: dc5099757ab269b4795951447ffda229, type: 2}

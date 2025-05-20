@@ -1,3 +1,4 @@
+using Sirenix.OdinInspector;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -32,9 +33,10 @@ public class SceneLoadManager : Singleton<SceneLoadManager>
         }
     }
 
+    [Button]
     public void LoadGameScene()
     {
-        SceneManager.LoadScene(2);
+        SceneManager.LoadScene(1);
     }
 
     public void LoadSplashScene()

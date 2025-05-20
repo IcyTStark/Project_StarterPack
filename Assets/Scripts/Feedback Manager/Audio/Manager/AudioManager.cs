@@ -62,6 +62,7 @@ namespace TMS.Feedback.Audio
             GameObject musicObj = new GameObject("Music Source");
             musicObj.transform.SetParent(_audioSourcesContainer.transform);
             _musicSource = musicObj.AddComponent<AudioSource>();
+            _musicSource.outputAudioMixerGroup = _audioSettings.MusicMixerGroup;
             _musicSource.playOnAwake = true;
             _musicSource.loop = true;
             _musicSource.volume = _audioSettings.MasterVolume * _audioSettings.MusicVolume;
@@ -73,6 +74,7 @@ namespace TMS.Feedback.Audio
             GameObject uiObj = new GameObject("UI Source");
             uiObj.transform.SetParent(_audioSourcesContainer.transform);
             _uiSource = uiObj.AddComponent<AudioSource>();
+            _uiSource.outputAudioMixerGroup = _audioSettings.UISoundMixerGroup;
             _uiSource.playOnAwake = false;
             _uiSource.loop = false;
             _uiSource.volume = _audioSettings.MasterVolume * _audioSettings.UISoundVolume;
@@ -94,7 +96,8 @@ namespace TMS.Feedback.Audio
             {
                 GameObject sfxPrefab = new GameObject("SFX Source");
                 prefab = sfxPrefab.AddComponent<AudioSourceItem>();
-                sfxPrefab.AddComponent<AudioSource>();
+                var sfxAudioSource = sfxPrefab.AddComponent<AudioSource>();
+                sfxAudioSource.outputAudioMixerGroup = _audioSettings.SfxMixerGroup;
 
                 // Keep the prefab object inactive and hidden
                 sfxPrefab.SetActive(false);
@@ -177,7 +180,7 @@ namespace TMS.Feedback.Audio
             if (clip == null) return;
 
             _currentMusicClip = clip;
-
+               
             // If we're already playing something, crossfade
             if (_musicSource.isPlaying && _musicSource.clip != null && _musicSource.clip != clip)
             {
@@ -218,6 +221,7 @@ namespace TMS.Feedback.Audio
             // Configure the source
             source.transform.position = position;
             source.AudioSource.clip = clip;
+            source.AudioSource.outputAudioMixerGroup ??= _audioSettings.SfxMixerGroup; //If its null then assign the SFX mixer group
             source.AudioSource.volume = _audioSettings.MasterVolume * _audioSettings.SfxVolume * volumeScale;
             source.AudioSource.spatialBlend = 1.0f; // Make it fully 3D
             source.AudioSource.Play();
@@ -270,6 +274,7 @@ namespace TMS.Feedback.Audio
 
             // Configure the source
             source.AudioSource.clip = clip;
+            source.AudioSource.outputAudioMixerGroup ??= _audioSettings.SfxMixerGroup; //If its null then assign the SFX mixer group
             source.AudioSource.volume = _audioSettings.MasterVolume * _audioSettings.SfxVolume * volumeScale;
             source.AudioSource.Play();
 

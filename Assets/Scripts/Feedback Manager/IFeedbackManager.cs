@@ -16,14 +16,18 @@ public interface IFeedbackManager
     void ToggleMusic();
     void ToggleSFX();
 
-    // Audio Methods
+    // Audio Methods (overloaded to accept either direct AudioClip or AudioType)
     void PlayMusic(AudioClip clip);
+    void PlayMusic(AudioType audioType);
     void PauseMusic();
     void ResumeMusic();
     void StopMusic();
     void PlaySFX(AudioClip clip, float volumeScale = 1f);
+    void PlaySFX(AudioType audioType, float volumeScale = 1f);
     void PlaySFXAtPosition(AudioClip clip, Vector3 position, float volumeScale = 1f);
+    void PlaySFXAtPosition(AudioType audioType, Vector3 position, float volumeScale = 1f);
     void PlayUISound(AudioClip clip, float volumeScale = 1f);
+    void PlayUISound(AudioType audioType, float volumeScale = 1f);
 
     // Volume Control
     void SetMasterVolume(float volume);
