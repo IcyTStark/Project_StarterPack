@@ -41,4 +41,5 @@ public interface IFeedbackManager
     void PlayEmphasisHaptics(float amplitude, float frequency);
     void PlayConstantHaptics(float amplitude, float frequency, float duration);
     void PlayHapticClip(HapticClip hapticClip, HapticPatterns.PresetType fallbackPreset = HapticPatterns.PresetType.Selection);
+    void Dispose();
 }
