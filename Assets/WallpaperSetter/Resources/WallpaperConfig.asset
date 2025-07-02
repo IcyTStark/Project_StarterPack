@@ -1,0 +1,35 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e5f7d6eabc5194027b1ff3fd805dc2b2, type: 3}
+  m_Name: WallpaperConfig
+  m_EditorClassIdentifier: 
+  wallpapers:
+  - wallpaper: {fileID: 21300000, guid: 3cfe15059d472465eacb5ecef76c1d42, type: 3}
+    saveName: AbstractCar
+  - wallpaper: {fileID: 21300000, guid: 012b37699b24e45519ffde725f34c42b, type: 3}
+    saveName: AbstractHorizon
+  - wallpaper: {fileID: 21300000, guid: c085f2c7c07fa40218a6733b2ed257f4, type: 3}
+    saveName: BumbleBee
+  - wallpaper: {fileID: 21300000, guid: 8fbda3bd42f4c4f31ba6ef9af8969765, type: 3}
+    saveName: Porche
+  - wallpaper: {fileID: 21300000, guid: 7941d556292dd49e18e224e6a56cd00c, type: 3}
+    saveName: Cyber Samurai
+  - wallpaper: {fileID: 21300000, guid: c6819f09eb7634e4aba12be8bb17cac8, type: 3}
+    saveName: Female
+  - wallpaper: {fileID: 21300000, guid: d2beb5729f0bf450195e02e414e1f954, type: 3}
+    saveName: GradientWaves
+  - wallpaper: {fileID: 21300000, guid: b7fa1f6dacc2043f9be3e3e552193662, type: 3}
+    saveName: JasonAndLucia
+  - wallpaper: {fileID: 21300000, guid: b64403cd3497a451d9b95ea3562a068b, type: 3}
+    saveName: Joker
+  - wallpaper: {fileID: 21300000, guid: 644ac784b78ed49e59e6382465d2d6bb, type: 3}
+    saveName: Spiderman
