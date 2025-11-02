@@ -1,6 +1,6 @@
 using UnityEngine;
-using EnhancedSignals;
 using Lofelt.NiceVibrations;
+using deVoid.Utils;
 
 using Sirenix.OdinInspector;
 using System;

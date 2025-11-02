@@ -1,5 +1,5 @@
 using System;
-using EnhancedSignals;
+using deVoid.Utils;
 
 public class OnDataLoadedSignal : ASignal
 {
