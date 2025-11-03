@@ -515,6 +515,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 43cee054d07024f40947583f0cebde7b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _address: Cube
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0

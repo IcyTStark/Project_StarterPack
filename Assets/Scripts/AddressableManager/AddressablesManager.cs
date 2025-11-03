@@ -22,9 +22,9 @@ namespace FIO.AddressablesSystem
             base.Awake();
         }
 
-        private void Start()
+        private async void Start()  
         {
-            InitializeAddressables().Forget();
+            await InitializeAddressables();
         }
 
         #region Addressables Initialization
@@ -32,7 +32,7 @@ namespace FIO.AddressablesSystem
         /// Initialize Addressables system early to avoid delays on first load.
         /// </summary>
         /// <returns></returns>
-        private async UniTaskVoid InitializeAddressables()
+        private async UniTask InitializeAddressables()
         {
             try
             {
@@ -43,7 +43,7 @@ namespace FIO.AddressablesSystem
                 {
                     Debug.Log($"{LOG_NAME} Addressables initialized successfully");
 
-                    CheckForContentUpdates().Forget();
+                    await CheckForContentUpdates();
 
                     Signals.Get<OnAddressableInitialized>().Dispatch();
                 }
@@ -59,10 +59,11 @@ namespace FIO.AddressablesSystem
             catch (System.Exception e)
             {
                 Debug.LogError($"{LOG_NAME} Addressables initialization failed: {e.Message}");
+                Signals.Get<OnAddressableInitializationFailed>().Dispatch();
             }
         }
 
-        private async UniTaskVoid CheckForContentUpdates()
+        private async UniTask CheckForContentUpdates()
         {
             try
             {
@@ -73,7 +74,7 @@ namespace FIO.AddressablesSystem
                 {
                     if (catalogsToUpdate.Count > 0)
                     {
-                        UpdateCatalogs(catalogsToUpdate).Forget();
+                        await UpdateCatalogs(catalogsToUpdate);
                     }
                     else
                     {
@@ -91,7 +92,7 @@ namespace FIO.AddressablesSystem
             }
         }
 
-        private async UniTaskVoid UpdateCatalogs(List<string> catalogsToUpdate)
+        private async UniTask UpdateCatalogs(List<string> catalogsToUpdate)
         {
             try
             {
@@ -119,7 +120,7 @@ namespace FIO.AddressablesSystem
 
         #region Asset Loading
         /// <summary>
-        /// Load an assets asynchronously by its address.
+        /// Load an asset asynchronously by its address.
         /// </summary>
         public async UniTask<T> LoadAssetAsync<T>(string address) where T : Object
         {
