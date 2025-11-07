@@ -4,6 +4,6 @@ namespace FIO.ModularAddressableSystem
 {
     public interface IInitializeAddressable
     {
-        public UniTask InitializeAddressableAsync();
+        public UniTask<bool> InitializeAddressableAsync();
     }
 }

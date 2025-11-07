@@ -11,7 +11,7 @@ public static class SceneSwitcher
     {
         EditorSceneManager.SaveCurrentModifiedScenesIfUserWantsTo();
 
-        EditorSceneManager.OpenScene(Application.dataPath + "/_Game_/Scenes/SplashScene.unity");
+        EditorSceneManager.OpenScene(Application.dataPath + "/Scenes/Bootstrap.unity");
     }
 
     [MenuItem("Tools/Scenes/Menu" + " &0")]
@@ -27,7 +27,7 @@ public static class SceneSwitcher
     {
         EditorSceneManager.SaveCurrentModifiedScenesIfUserWantsTo();
 
-        EditorSceneManager.OpenScene(Application.dataPath + "/_Game_/Scenes/GameScene.unity");
+        EditorSceneManager.OpenScene(Application.dataPath + "/Scenes/GameScene.unity");
     }
 
     [MenuItem("Tools/Scenes/Test" + " &`")]

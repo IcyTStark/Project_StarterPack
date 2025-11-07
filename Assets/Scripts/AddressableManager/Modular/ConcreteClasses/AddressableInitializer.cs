@@ -1,30 +1,32 @@
-using UnityEngine;
-
 using Cysharp.Threading.Tasks;
-
+using deVoid.Utils;
+using UnityEngine;
 using UnityEngine.AddressableAssets;
+using UnityEngine.ResourceManagement.AsyncOperations;
 using VContainer;
 
 namespace FIO.ModularAddressableSystem
 {
     public class AddressableInitializer : IInitializeAddressable
     {
-        public async UniTask InitializeAddressableAsync()
+        public async UniTask<bool> InitializeAddressableAsync()
         {
             try
             {
-                Debug.Log("Initializing Addressables...");
+                var initHandle = Addressables.InitializeAsync();
+                await initHandle.ToUniTask();
 
-                // This initializes Unity's Addressables system
-                var handle = Addressables.InitializeAsync();
-                await handle.ToUniTask(); // Convert to UniTask
+                if (initHandle.Status == AsyncOperationStatus.Succeeded)
+                {
+                    return true;
+                }
 
-                Debug.Log("Addressables initialized successfully!");
+                Addressables.Release(initHandle);
+                return false;
             }
-            catch (System.Exception ex)
+            catch (System.Exception e)
             {
-                Debug.LogError($"Failed to initialize Addressables: {ex.Message}");
-                throw;
+                return false;
             }
         }
     }
