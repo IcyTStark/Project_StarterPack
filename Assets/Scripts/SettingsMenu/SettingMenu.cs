@@ -1,6 +1,6 @@
 using UnityEngine;
-
 using UnityEngine.UI;
+using VContainer;
 
 public class SettingMenu : MonoBehaviour
 {
@@ -8,50 +8,38 @@ public class SettingMenu : MonoBehaviour
     [SerializeField] private Toggle soundToggle;
     [SerializeField] private Toggle vibrationToggle;
 
-    [SerializeField] private FeedbackSaveData feedbackSaveData;
-    [SerializeField] private IFeedbackManager feedbackManager;
+    [Inject] private IFeedbackManager feedbackManager;
 
     public void OpenPopUp()
     {
-        Initialization();
+        InitializeToggles();
         gameObject.SetActive(true);
     }
 
-    private void Initialization()
+    private void InitializeToggles()
     {
-        feedbackManager = ServiceLocator.GetService<IFeedbackManager>();
-
-        feedbackSaveData = SaveManager.Instance.SaveData.feedbackSaveData;
-
-        musicToggle.isOn = feedbackSaveData.isMusicOn;
-        soundToggle.isOn = feedbackSaveData.isSFXOn;
-        vibrationToggle.isOn = feedbackSaveData.isHapticOn;
+        // Set toggle states WITHOUT triggering their events
+        musicToggle.SetIsOnWithoutNotify(feedbackManager.IsMusicOn);
+        soundToggle.SetIsOnWithoutNotify(feedbackManager.IsSFXOn);
+        vibrationToggle.SetIsOnWithoutNotify(feedbackManager.IsHapticOn);
     }
 
     public void ToggleMusic()
     {
         feedbackManager.ToggleMusic();
-        feedbackSaveData = SaveManager.Instance.SaveData.feedbackSaveData;
-        musicToggle.isOn = feedbackSaveData.isMusicOn;
+        musicToggle.SetIsOnWithoutNotify(feedbackManager.IsMusicOn);
     }
 
     public void ToggleSound()
     {
         feedbackManager.ToggleSFX();
-        feedbackSaveData = SaveManager.Instance.SaveData.feedbackSaveData;
-        soundToggle.isOn = feedbackSaveData.isSFXOn;
+        soundToggle.SetIsOnWithoutNotify(feedbackManager.IsSFXOn);
     }
 
     public void ToggleVibration()
     {
         feedbackManager.ToggleHaptics();
-        feedbackSaveData = SaveManager.Instance.SaveData.feedbackSaveData;
-        vibrationToggle.isOn = feedbackSaveData.isHapticOn;
-    }
-
-    private void OnDisable()
-    {
-        feedbackManager.Dispose();
+        vibrationToggle.SetIsOnWithoutNotify(feedbackManager.IsHapticOn);
     }
 
     public void Close()
