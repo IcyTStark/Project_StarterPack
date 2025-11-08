@@ -35,6 +35,8 @@ namespace TMS.Feedback
             LoadAudio();
             LoadHaptics();
 
+            SmartDebug.Log("FeedbackManager loaded");
+            
             Signals.Get<OnDataLoadedSignal>().AddListener(OnDataLoaded);
         }
 
@@ -49,12 +51,16 @@ namespace TMS.Feedback
             }
 
             _audioManager ??= new AudioManager(_audioSettings);
+            
+            SmartDebug.Log("AudioManager", "Loading Audio Settings");
         }
 
         private void LoadHaptics()
         {
             _hapticSettings = Resources.Load<HapticSettingsConfigSO>("HapticSettings");
             _hapticsManager ??= new HapticsManager(_hapticSettings);
+            
+            SmartDebug.Log("HapticsManager", "Loading Haptics");
         }
 
         #region Load and Save

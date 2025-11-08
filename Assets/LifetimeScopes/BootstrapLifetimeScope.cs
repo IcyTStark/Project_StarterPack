@@ -2,10 +2,11 @@ using VContainer;
 using VContainer.Unity;
 
 using FIO.ModularAddressableSystem;
+using TMS.Feedback;
 
 public class BootstrapLifetimeScope : LifetimeScope
 {
-    private BootstrapLifetimeScope Instance;
+    private static BootstrapLifetimeScope Instance;
 
     protected override void Awake()
     {
@@ -24,6 +25,7 @@ public class BootstrapLifetimeScope : LifetimeScope
     protected override void Configure(IContainerBuilder builder)
     {
         RegisterAddressableDependency(builder);
+        RegisterFeedbackDependency(builder);
     }
 
     private void RegisterAddressableDependency(IContainerBuilder builder)
@@ -40,5 +42,10 @@ public class BootstrapLifetimeScope : LifetimeScope
 
         //Register AddressableManager
         builder.Register<AddressablesManager>(Lifetime.Singleton);
+    }
+
+    private void RegisterFeedbackDependency(IContainerBuilder builder)
+    {
+        builder.Register<IFeedbackManager, FeedbackManager>(Lifetime.Singleton);
     }
 }
