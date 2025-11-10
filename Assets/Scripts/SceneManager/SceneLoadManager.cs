@@ -25,7 +25,12 @@ public class SceneLoadManager : Singleton<SceneLoadManager>
 
     }
 
-    private void OnDataLoaded(OnDataLoadedSignal signal)
+    private void Start()
+    {
+        OnDataLoaded();
+    }
+
+    private void OnDataLoaded(OnDataLoadedSignal signal = null)
     {
         if (shouldLoadGameScene)
         {

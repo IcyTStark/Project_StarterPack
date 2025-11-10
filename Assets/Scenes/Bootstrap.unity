@@ -572,7 +572,6 @@ GameObject:
   m_Component:
   - component: {fileID: 1847862835}
   - component: {fileID: 1847862834}
-  - component: {fileID: 1847862836}
   m_Layer: 0
   m_Name: Scene Manager
   m_TagString: Untagged
@@ -592,7 +591,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f481150ba6e7943b5869843bada129ad, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  shouldLoadGameScene: 0
+  shouldLoadGameScene: 1
 --- !u!4 &1847862835
 Transform:
   m_ObjectHideFlags: 0
@@ -608,19 +607,6 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &1847862836
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1847862833}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: ee37eb47612ef4846a643c13108d4f3b, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  audioType: 0
 --- !u!1 &1879821781
 GameObject:
   m_ObjectHideFlags: 0
