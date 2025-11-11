@@ -1,9 +1,6 @@
 public enum AudioType
 {
-    GameMusic,
-    MenuMusic,
-    SFX1,
-    SFX2,
-    SFX3,
-    SFX4
+    GAME_MUSIC,
+    MENU_MUSIC,
+    UI_BUTTON_CLICK,
 }

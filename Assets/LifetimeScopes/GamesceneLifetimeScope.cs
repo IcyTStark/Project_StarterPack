@@ -11,6 +11,8 @@ public class GamesceneLifetimeScope : LifetimeScope
 
         RegisterUICameraDependency(builder);
 
+        ResolveFeedbackDependency(builder);
+
         //ResolveUICameraDependency(builder);
     }
 
@@ -22,6 +24,11 @@ public class GamesceneLifetimeScope : LifetimeScope
     private void ResolveUICameraDependency(IContainerBuilder builder)
     {
         builder.RegisterComponentInHierarchy<AttachUICamera>();
+    }
+
+    private void ResolveFeedbackDependency(IContainerBuilder builder)
+    {
+        builder.RegisterComponentInHierarchy<ButtonOnClickSFX>();
     }
 
     private void ResolveAddressableDependency(IContainerBuilder builder)

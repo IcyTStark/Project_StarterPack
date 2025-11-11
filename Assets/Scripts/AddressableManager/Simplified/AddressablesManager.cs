@@ -10,7 +10,7 @@ using UnityEngine.ResourceManagement.AsyncOperations;
 
 namespace FIO.AddressablesSystem
 {
-    public class AddressablesManager : Singleton<AddressablesManager>
+    public class AddressablesManager : PersistantSingleton<AddressablesManager>
     {
         private const string LOG_NAME = "[AddressableManager]";
 

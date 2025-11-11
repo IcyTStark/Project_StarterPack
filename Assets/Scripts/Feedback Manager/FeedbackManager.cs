@@ -36,7 +36,9 @@ namespace TMS.Feedback
             LoadHaptics();
 
             SmartDebug.Log("FeedbackManager loaded");
-            
+
+            OnDataLoaded();
+
             Signals.Get<OnDataLoadedSignal>().AddListener(OnDataLoaded);
         }
 

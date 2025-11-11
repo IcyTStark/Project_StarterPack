@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public class AppConfigurator : Singleton<AppConfigurator>
+public class AppConfigurator : PersistantSingleton<AppConfigurator>
 {
     private AppConfigSettings _appConfigSettings;
 

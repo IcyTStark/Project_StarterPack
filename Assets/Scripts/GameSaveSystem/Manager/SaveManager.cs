@@ -4,7 +4,7 @@ using System.Threading.Tasks;
 
 using UnityEngine;
 
-public class SaveManager : Singleton<SaveManager>
+public class SaveManager : PersistantSingleton<SaveManager>
 {
     private ISaveSystem saveSystem;
 

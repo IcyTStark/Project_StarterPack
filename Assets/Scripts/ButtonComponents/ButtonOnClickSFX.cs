@@ -2,7 +2,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using VContainer;
 
-public class PlayButtonSFX : MonoBehaviour
+public class ButtonOnClickSFX : MonoBehaviour
 {
     [Inject] private IFeedbackManager feedbackManager;
     [SerializeField] private AudioType audioType;
@@ -31,6 +31,6 @@ public class PlayButtonSFX : MonoBehaviour
 
     private void OnButtonClick()
     {
-        feedbackManager.PlayUISound(audioType);
+        feedbackManager?.PlayUISound(audioType);
     }
 }

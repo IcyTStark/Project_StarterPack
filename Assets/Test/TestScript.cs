@@ -1,5 +1,7 @@
+using Cysharp.Threading.Tasks;
 using FIO.ModularAddressableSystem;
 using Sirenix.OdinInspector;
+using System.Threading.Tasks;
 using TMS.Feedback;
 using UnityEngine;
 using VContainer;
@@ -7,7 +9,7 @@ using VContainer.Unity;
 
 public class TestScript : MonoBehaviour
 {
-    //[Inject] private AddressablesManager addressablesManager;
+    [Inject] private AddressablesManager addressablesManager;
 
     //[Inject] private IFeedbackManager feedbackManager;
 

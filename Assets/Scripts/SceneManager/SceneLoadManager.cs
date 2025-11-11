@@ -5,7 +5,7 @@ using UnityEngine;
 
 using UnityEngine.SceneManagement;
 
-public class SceneLoadManager : Singleton<SceneLoadManager>
+public class SceneLoadManager : PersistantSingleton<SceneLoadManager>
 {
     [Header("Editor bools: ")]
     [SerializeField] private bool shouldLoadGameScene = false;

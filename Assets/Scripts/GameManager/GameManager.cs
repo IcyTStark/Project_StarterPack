@@ -1,7 +1,7 @@
 using UnityEngine;
 using Sirenix.OdinInspector;
 
-public class GameManager : Singleton<GameManager>
+public class GameManager : PersistantSingleton<GameManager>
 {
     [SerializeField] private AudioClip _backgroundMusic;
 

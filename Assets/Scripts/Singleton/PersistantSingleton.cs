@@ -1,7 +1,7 @@
 using UnityEngine;
 using System;
 
-public class Singleton<T> : MonoBehaviour where T : Component
+public class PersistantSingleton<T> : MonoBehaviour where T : Component
 {
     private static T _instance;
     private static readonly object _lock = new object();
